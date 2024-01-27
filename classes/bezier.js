@@ -1,20 +1,22 @@
-
-
 class Bezier{
     // points -> array of points of beziers -> varies as bezier's degree changes
     // coeffs -> coefficients in Bernstein polynomial
-    constructor(points){
+    constructor(points, injected = [], cumD = []){
         this.points = points;
-        this.size = points.length - 1;
+        this.injected = injected;
+        this.cumD = cumD;
     }
 
     // calculates the value of the a bezier at a chosen t value
+    // returns a Point
     // pts = points of the bezier curve
     // uses deCasteljau algorithm (recursive)
     // https://en.wikipedia.org/wiki/De_Casteljau%27s_algorithm 
-    static deCasteljau(pts, t){
+    deCasteljau(t){
+        const bez = new Bezier(this.points);
+        const pts = bez.points;
         if (pts.length === 1) {
-            return pts;
+            return pts[0];
         }
         const newPts = [];
         
@@ -22,124 +24,83 @@ class Bezier{
             const next = Point.lerp(pts[i], pts[i + 1], t);
             newPts.push(next);
         }
+        bez.points = newPts;
+        return bez.deCasteljau(t);
+    }
+
+    // injects numPoints of points into the curve
+    // result is stored in this.injected as an array of [t value, Point]
+    inject(numPoints){
+        const path = [];
+        for (let i = 0; i <= numPoints; i++) {
+            const t = i / numPoints;
+            const addPoint = this.deCasteljau(t);
+            path.push([t, addPoint]);
+        }
+        this.injected = path;
         
-        return deCasteljau(next, t);
+        return this;
     }
 
-    
-}
-
-
-function choose(n, k){
-    if((n / 2) < k){
-        k = n - k;
-    }
-    if(k == 0) {
-        return 1;
-    }
-    if(k > n){
-        return 0;
-    }
-    let result = 1;
-    for(let i = n; i > n - k; i--){
-        result = result * i;
-    }
-    for(let i = 1; i <= k; i++){
-        result = result / i;
-    }
-    return result;
-    
-}
-
-// generates coefficients for bezier curves expressed in berstein polynomial form
-// n is the degree of the bezier curve
-function generateBernstein(n){
-    const coeffs = [];
-    for(let i = 0; i <= n; i++){
-        const coI = [];
-        const cof = choose(n, i);
-        for(let k = n - i; k >= 0; k--){
-            if ((k % 2) == 1){
-                coI.push(-1 * cof * choose(n - i, k));
-            }
-            else{
-                coI.push(cof * choose(n - i, k));
-            }
-        }
-
-        while(coI.length < (n + 1)){
-            coI.push(0);
-        }
-        coeffs.push(coI);
-
-    }
-    return coeffs;
-}
-
-class bernsteinBezier extends Bezier {
-    constructor(points){
-        super(points);
-        this.size = points.length - 1;
-        this.coeffs = generateBernstein(points.length - 1);
-    }
-
-    evaluate(t){
-        const degree = this.points.length - 1;
-        const tCoeffs = [];
-        for(let i = 0; i <= degree; i++){
-            let tValue = 0;
-            for(let k = 0; k <= degree; k++){
-                tValue += + t * this.coeffs[i][k] * Math.pow(t, degree - k);
-            }
-            tCoeffs.push(tValue);
-        }
-
-        let pt = new Point(0, 0);
-        for(let i = 0; i <= degree; i++){
-            pt = pt + this.points[i].multiply(tCoeffs[i]);
-        }
-        return pt;
+    // generates cumulative Distance LUT
+    // result is stored in this.cumD as an array of [t value, cumulative Distance ]
+    generateCD(){
+        let d = 0;
+        const cumDistance = [[0, 0]];
         
-    }
-
-
-    // calculates derivative (velocity)
-    derivative(){
-        const degree = points.length - 1;
-        for(let i = 0; i <= degree; i++){
-            for(let k = 0; k <= degree; k++){
-                this.coeffs[i][k] *= (degree - k);
-            }
-            this.coeffs[i].pop();
-            this.coeffs[i].unshift(0);
+        for (let i = 0; i < this.injected.length - 1; i++) {
+            const pointToPointDistance = Point.distance(this.injected[i][1], this.injected[i + 1][1]);
+            d += pointToPointDistance;
+            cumDistance.push([this.injected[i + 1][0], d]);
         }
+        
+        this.cumD = cumDistance;
         return this;
     }
 
-    //calculates 2nd derivative (acceleration)
-    secondDerivative(){
-        this.derivative();
-        this.derivative();
-        return this;
+    // gets t-value for a distance value given the cum dist LUT
+    getT(dist){
+        for(let i = 1; i < this.cumD.length; i++){
+            if(this.cumD[i][1] >= dist){
+                const dValue1 = new Point(this.cumD[i - 1][0], this.cumD[i - 1][1]);
+                const dValue2 = new Point(this.cumD[i][0], this.cumD[i][1]);
+                
+                const t = (dist - dValue1.y) / (dValue2.y - dValue1.y);
+                
+                const findingT = Point.lerp(dValue1, dValue2, t);
+                return(findingT.x);
+            }
+        }
     }
 
-    // calculates 3rd derivative (jerk)
-    thirdDerivative(){
-        this.secondDerivative();
-        this.derivative();
-        return this;
-    }
+    // injects points based on distance between each 2 points instead of t values
+    // adjust -> if true, adjust the distance between by a tiny margin such that the end point of the bezier is contained on the injected bezier
+    // if false, no adjustment is made.
+    spaceInject(distBetween, adjust = true){
+        //default injects 50, generates cD if the injected attribute is empty
+        if(this.injected.length == 0){
+            this.inject(50); 
+            this.generateCD();
+        }
+        
+        const path = [];
+
+        const curveLength = this.cumD[-1][1];
+        const numPoints = Math.floor(curveLength / distBetween);
+
+        //adjusting distance between 
+        if(adjust == true){
+            distBetween = curveLength / numPoints;
+        }
 
 
-    // calculates signed curvature at t value
-    curvature(t){
-        const firstD = this.derivative();
-        const secondD = this.secondDerivative();
-        const firstDPoint = firstD.evaluate(t);
-        const secondDPoint = secondD.evaluate(t);
-        const numerator = firstDPoint.x * secondDPoint.y - firstDPoint.y * secondDPoint.x;
-        const denominator = Math.pow(firstDPoint.magnitude(), 3);
-        return numerator / denominator;
+        for(let i = 0; i < numPoints + 1; i++){
+            const distAtPoint = i * distBetween;
+            const t = this.getT(distAtPoint);
+            path.push([t, this.deCasteljau(t)]);
+        }
+        this.injected = path;
     }
 
 }
+
