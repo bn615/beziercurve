@@ -1,4 +1,4 @@
-class Bezier{
+class Castel{
     // points -> array of points of beziers -> varies as bezier's degree changes
     // coeffs -> coefficients in Bernstein polynomial
     constructor(points, injected = [], cumD = []){
@@ -13,7 +13,7 @@ class Bezier{
     // uses deCasteljau algorithm (recursive)
     // https://en.wikipedia.org/wiki/De_Casteljau%27s_algorithm 
     deCasteljau(t){
-        const bez = new Bezier(this.points);
+        const bez = new Castel(this.points);
         const pts = bez.points;
         if (pts.length === 1) {
             return pts[0];
