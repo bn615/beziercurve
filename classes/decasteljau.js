@@ -85,7 +85,7 @@ class Castel{
         
         const path = [];
 
-        const curveLength = this.cumD[-1][1];
+        const curveLength = this.cumD[this.cumD.length - 1][1];
         const numPoints = Math.floor(curveLength / distBetween);
 
         //adjusting distance between 
