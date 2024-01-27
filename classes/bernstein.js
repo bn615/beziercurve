@@ -103,7 +103,7 @@ class Bernstein {
 
     // gets t-value for a distance value given the cum dist LUT
     getT(dist){
-        for(let i = 1; i < this.cumD - 1; i++){
+        for(let i = 1; i < this.cumD.length - 1; i++){
             if(this.cumD[i][1] >= dist){
                 const dValue1 = new Point(this.cumD[i - 1][0], this.cumD[i - 1][1]);
                 const dValue2 = new Point(this.cumD[i][0], this.cumD[i][1]);
