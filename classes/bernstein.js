@@ -60,8 +60,7 @@ class Bernstein {
         for(let i = 0; i <= degree; i++){
             let tValue = 0;
             for(let k = 0; k <= degree; k++){
-                
-                tValue += + t * this.coeffs[i][k] * Math.pow(t, degree - k);
+                tValue += this.coeffs[i][k] * Math.pow(t, degree - k);
             }
             tCoeffs.push(tValue);
         }
