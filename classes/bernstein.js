@@ -33,7 +33,7 @@ function generateBernstein(n){
             else{
                 coI.push(cof * choose(n - i, k));
             }
-        }
+        }   
 
         while(coI.length < (n + 1)){
             coI.push(0);
