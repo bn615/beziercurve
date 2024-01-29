@@ -19,12 +19,12 @@ class Point {
 
     // d * (x, y) = (dx, dy)
     multiply(d) {
-      return new Point(this.x * d, this.y * d, this.index);
+      return new Point(this.x * d, this.y * d);
     }
   
     // d * (x, y) = (x/d, y/d)
     divide(d) {
-      return new Point(this.x / d, this.y / d, this.index);
+      return new Point(this.x / d, this.y / d);
     }
   
     static equals(pt1, pt2) {
@@ -47,7 +47,7 @@ class Point {
       const shifted = new Point(pt2.x - pt1.x, pt2.y - pt1.y);
       const xcord = shifted.x * Math.cos(theta) - shifted.y * Math.sin(theta);
       const ycord = shifted.y * Math.cos(theta) + shifted.x * Math.sin(theta);
-      return new Point(xcord + pt1.x, ycord + pt1.y, pt1.index);
+      return new Point(xcord + pt1.x, ycord + pt1.y);
     }
   
     static print(pt) {
