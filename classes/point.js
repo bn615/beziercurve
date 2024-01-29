@@ -7,8 +7,17 @@ class Point {
   
 
     // adds x coords of each point and y coords of each point
-    static add(pt1, pt2) {
+    static add(pt1, pt2){
       return new Point(pt1.x + pt2.x, pt1.y + pt2.y);
+    }
+
+
+    static sum() {
+      var total = new Point(0, 0);
+        for (let i = 0; i < arguments.length; i++) {
+          total = this.add(total, arguments[i]);
+        }
+      return total;
     }
   
     // (x1, y1) - (x2, y2) = (x1 - x2, y1 - y2)
