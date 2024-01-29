@@ -142,6 +142,7 @@ class Bernstein {
             path.push([t, this.evaluate(t)]);
         }
         this.injected = path;
+        return this;
     }
 
     // calculates derivative (velocity)
