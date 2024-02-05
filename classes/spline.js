@@ -82,6 +82,13 @@ class bezierSpline {
         
     }
 
+    update(distBetween){
+        this.section();
+        this.inject(50 * this.sectioned.length); 
+        this.MultiCumDistLUT();
+        this.spaceInject(distBetween);
+    }
+
     // returns complete spline
     transfer(){
         const path = [];
@@ -91,6 +98,36 @@ class bezierSpline {
        return path;
 
     }
+    
 
+    static project(projected, p1, p2){
+        const aVector = Point.subtract(projected, p1);
+        const bVector = Point.subtract(p2, p1);
+        return Point.sum(p1, bVector.multiply(Point.dotProduct(aVector, bVector) / Point.dotProduct(bVector, bVector)));
+    }
+
+
+    adjust3k_0(){
+        for(let i = 3; i < this.points.length - 1; i += 3){
+            this.points[i] = this.constructor.project(this.points[i], this.points[i - 1], this.points[i + 1]);
+        }
+        return this;
+    }
+
+    adjust3k_1(){
+        for(let i = 4; i < this.points.length; i += 3){
+            this.points[i] = this.constructor.project(this.points[i], this.points[i - 2], this.points[i - 1]);
+        }
+        return this;
+    }
+
+    adjust3k_2(){
+        for(let i = 2; i < this.points.length - 2; i += 3){
+            this.points[i] = this.constructor.project(this.points[i], this.points[i + 1], this.points[i + 2]);
+        }
+        return this;
+    }
+    
 
 }
+
