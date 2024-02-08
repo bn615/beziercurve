@@ -127,6 +127,11 @@ class bezierSpline {
         }
         return this;
     }
+    curvature(t){
+        const u = Math.floor(t);
+        const tPrime = t - u;
+        return this.sectioned[u].evaluate(tPrime);
+    }
     
 
 }
