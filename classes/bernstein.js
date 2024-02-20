@@ -34,12 +34,10 @@ function generateBernstein(n){
                 coI.push(cof * choose(n - i, k));
             }
         }   
-
         while(coI.length < (n + 1)){
             coI.push(0);
         }
         coeffs.push(coI);
-
     }
     return coeffs;
 }
@@ -181,6 +179,10 @@ class Bernstein {
         const numerator = firstDPoint.x * secondDPoint.y - firstDPoint.y * secondDPoint.x;
         const denominator = Math.pow(firstDPoint.magnitude(), 3);
         return numerator / denominator;
+    }
+
+    generateVelocity(maxAccel){
+
     }
 
 }

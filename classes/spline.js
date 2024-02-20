@@ -133,6 +133,15 @@ class bezierSpline {
         return this.sectioned[u].evaluate(tPrime);
     }
     
+    generateSpeeds(){
+        for(let i = 0; i < this.sectioned.length; i++){
+            const bez = this.sectioned[i];
+            let t = 0;
+            while(t >= i && t <+ i + 1){
+                
+            }
+        }
+    }
 
 }
 
