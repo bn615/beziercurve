@@ -27,20 +27,7 @@ class CatmullRom{
         return c;
     }
 
-    generate(maxAccel){
-        const path = [];
-        for(let i = 0; i < this.points.length - 3; i++){
-            const dist = Point.distance(this.points[i + 1], this.points[i + 2]);
-            for(let j = 0; j < dist; j++){
-                const t = j / floor(dist);
-                const newPoint = this.evaluate(t, this.points[i], this.points[i + 1], this.points[i + 2], this.points[i + 3]);
-                path.push(newPoint);
-            }
-        }
-        this.injected = path;
-        this.speeds(maxAccel)
-        return this;
-    }
+   
 
     speeds(maxAccel){
         this.injected[this.injected.length - 1].push(0);
@@ -54,4 +41,20 @@ class CatmullRom{
         return this;
     }
 
+
+    generate(maxAccel){
+        this.addGhostPoints();
+        const path = [];
+        for(let i = 0; i < this.points.length - 3; i++){
+            const dist = Point.distance(this.points[i + 1], this.points[i + 2]);
+            for(let j = 0; j < dist; j++){
+                const t = j / floor(dist);
+                const newPoint = this.evaluate(t, this.points[i], this.points[i + 1], this.points[i + 2], this.points[i + 3]);
+                path.push(newPoint);
+            }
+        }
+        this.injected = path;
+        this.speeds(maxAccel)
+        return this;
+    }
 }
