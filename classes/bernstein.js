@@ -172,8 +172,9 @@ class Bernstein {
 
     // calculates signed curvature at t value
     curvature(t){
-        const firstD = this.derivative();
-        const secondD = this.secondDerivative();
+        const bez = new Bernstein(this.points);
+        const firstD = bez.derivative();
+        const secondD = bez.secondDerivative();
         const firstDPoint = firstD.evaluate(t);
         const secondDPoint = secondD.evaluate(t);
         const numerator = firstDPoint.x * secondDPoint.y - firstDPoint.y * secondDPoint.x;
