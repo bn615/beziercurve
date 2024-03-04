@@ -27,13 +27,12 @@ class CatmullRom{
         return c;
     }
 
-    inject(scale){
+    inject(){
         const path = [];
         for(let i = 0; i < this.points.length - 3; i++){
             const dist = Point.distance(this.points[i + 1], this.points[i + 2]);
-            const nu = Math.floor(dist/scale);
-            for(let j = 0; j < nu; j++){
-                const t = j / nu;
+            for(let j = 0; j < dist; j++){
+                const t = j / floor(dist);
                 const newPoint = this.evaluate(t, this.points[i], this.points[i + 1], this.points[i + 2], this.points[i + 3]);
                 path.push(newPoint);
             }

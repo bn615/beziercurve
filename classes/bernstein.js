@@ -145,7 +145,7 @@ class Bernstein {
 
     // calculates derivative (velocity)
     derivative(){
-        const bez = new bernsteinBezier(this.points, this.coeffs);
+        const bez = new Bernstein(this.points, this.coeffs);
         const degree = bez.points.length - 1;
         for(let i = 0; i <= degree; i++){
             for(let k = 0; k <= degree; k++){
@@ -159,13 +159,13 @@ class Bernstein {
 
     //calculates 2nd derivative (acceleration)
     secondDerivative(){
-        const bez = new bernsteinBezier(this.points);
+        const bez = new Bernstein(this.points);
         return bez.derivative().derivative();
     }
 
     // calculates 3rd derivative (jerk)
     thirdDerivative(){
-        const bez = new bernsteinBezier(this.points);
+        const bez = new Bernstein(this.points);
         return bez.secondDerivative().derivative();
     }
 
