@@ -38,8 +38,16 @@ class bezierSpline {
     }
 
     MultiCumDistLUT(){
+        let lastLD = 0;
         for(let i = 0; i < this.sectioned.length; i++){
             this.sectioned[i].generateCD();
+            for(let j = 0; j < this.sectioned[i].cumD.length; j++){
+                this.sectioned[i].cumD[j][1] += lastLD;
+                // console.log(this.sectioned[i].cumD[j])
+            }
+            lastLD = lastLD + this.sectioned[i].cumD[this.sectioned[i].cumD.length - 1][1];
+           
+            
         }
         return this;
     }
@@ -81,12 +89,6 @@ class bezierSpline {
         
     }
 
-    update(distBetween){
-        this.section();
-        this.inject(50 * this.sectioned.length); 
-        this.MultiCumDistLUT();
-        this.spaceInject(distBetween);
-    }
 
     // returns complete spline
     generateSpline(distBetween, maxAccel){
@@ -130,22 +132,30 @@ class bezierSpline {
         }
         return this;
     }
+
+    // fix tmrw
     curvature(t){
         const u = Math.floor(t);
         const tPrime = t - u;
         return this.sectioned[u].evaluate(tPrime);
     }
     
-    generateVelocities(maxAccel){
+    generateVelocities(maxVel, maxAccel, k = 1){
         // velocity of last point to be 0
         this.spline[this.spline.length - 1].push(0);
+
+        // unfinished
+        for(let i = 0; i < this.spline.length - 1; i++){
+            let vel = min(maxVel, k / this.curvature(this.spline[i][0]));
+            this.spline[i].push(vel);
+        }
 
         // velocity of all the other points
         for(let i = this.spline.length - 1; i > 0; i--){
             const dist = Point.distance(this.spline[i][1], this.spline[i - 1][1]);
             let newVel = Math.sqrt(2 * maxAccel * dist + Math.pow(this.spline[i][2], 2));
-            newVel = Math.min(newVel, this.spline[i][2]);
-            this.spline[i - 1].push(newVel);
+            newVel = Math.min(this.spline[i - 1][2], this.spline[i][2]);
+            this.spline[i - 1][2] = newVel; 
         }
         return this;
     }
