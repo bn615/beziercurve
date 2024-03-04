@@ -181,8 +181,5 @@ class Bernstein {
         return numerator / denominator;
     }
 
-    generateVelocity(maxAccel){
-
-    }
-
+    
 }

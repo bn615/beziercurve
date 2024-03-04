@@ -89,11 +89,14 @@ class bezierSpline {
     }
 
     // returns complete spline
-    generateSpline(distBetween){
+    generateSpline(distBetween, maxAccel){
         spaceInject(distBetween);
+        generateVelocities(maxAccel);
         const path = [];
+
+        // first index is point, second part is speed
         for(let i = 0; i < this.spline.length; i++){
-            path.push(this.spline[i][1]);
+            path.push([this.spline[i][1], this.spline[i][2]]);
         }
        return path;
 
@@ -133,13 +136,15 @@ class bezierSpline {
         return this.sectioned[u].evaluate(tPrime);
     }
     
-    generateSpeeds(){
-        for(let i = 0; i < this.sectioned.length; i++){
-            const bez = this.sectioned[i];
-            let t = 0;
-            while(t >= i && t <+ i + 1){
-                
-            }
+    generateVelocities(maxAccel){
+        // velocity of last point to be 0
+        this.spline[this.spline.length - 1].push(0);
+
+        // velocity of all the other points
+        for(let i = this.spline.length - 1; i > 0; i--){
+            const dist = Point.distance(this.spline[i][1], this.spline[i - 1][1]);
+            newVel = Math.sqrt(2 * maxAccel * dist + Math.pow(this.spline[i][2], 2));
+            this.spline[i - 1].push(newVel);
         }
     }
 
