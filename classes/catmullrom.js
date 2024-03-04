@@ -27,7 +27,7 @@ class CatmullRom{
         return c;
     }
 
-    inject(){
+    generate(maxAccel){
         const path = [];
         for(let i = 0; i < this.points.length - 3; i++){
             const dist = Point.distance(this.points[i + 1], this.points[i + 2]);
@@ -38,7 +38,7 @@ class CatmullRom{
             }
         }
         this.injected = path;
-
+        this.speeds(maxAccel)
         return this;
     }
 
@@ -54,10 +54,4 @@ class CatmullRom{
         return this;
     }
 
-    catGen(maxAccel){
-        this.addGhostPoints();
-        this.inject();
-        this.speeds(maxAccel);
-        return this;
-    }
 }
