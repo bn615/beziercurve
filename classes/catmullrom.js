@@ -38,6 +38,18 @@ class CatmullRom{
             }
         }
         this.injected = path;
+
         return this;
+    }
+
+    speeds(maxAccels){
+        this.injected[this.injected.length - 1].push(0);
+
+        for(let i = this.injected.length - 1; i > 0; i--){
+            const dist = Point.distance(this.injected[i][1], this.injected[i - 1][1]);
+            newVel = Math.sqrt(2 * maxAccel * dist + Math.pow(this.injected[i][2], 2));
+            this.injected[i - 1].push(newVel);
+        }
+        return speeds;
     }
 }

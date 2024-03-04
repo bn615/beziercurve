@@ -90,8 +90,8 @@ class bezierSpline {
 
     // returns complete spline
     generateSpline(distBetween, maxAccel){
-        spaceInject(distBetween);
-        generateVelocities(maxAccel);
+        this.spaceInject(distBetween);
+        this.generateVelocities(maxAccel);
         const path = [];
 
         // first index is point, second part is speed
