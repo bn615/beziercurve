@@ -34,7 +34,7 @@ class CatmullRom{
 
         for(let i = this.injected.length - 1; i > 0; i--){
             const dist = Point.distance(this.injected[i][1], this.injected[i - 1][1]);
-            newVel = Math.sqrt(2 * maxAccel * dist + Math.pow(this.injected[i][2], 2));
+            let newVel = Math.sqrt(2 * maxAccel * dist + Math.pow(this.injected[i][2], 2));
             newVel = Math.min(newVel, this.spline[i][2]);
             this.injected[i - 1].push(newVel);
         }

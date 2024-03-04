@@ -143,7 +143,7 @@ class bezierSpline {
         // velocity of all the other points
         for(let i = this.spline.length - 1; i > 0; i--){
             const dist = Point.distance(this.spline[i][1], this.spline[i - 1][1]);
-            newVel = Math.sqrt(2 * maxAccel * dist + Math.pow(this.spline[i][2], 2));
+            let newVel = Math.sqrt(2 * maxAccel * dist + Math.pow(this.spline[i][2], 2));
             newVel = Math.min(newVel, this.spline[i][2]);
             this.spline[i - 1].push(newVel);
         }
