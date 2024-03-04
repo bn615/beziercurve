@@ -59,11 +59,10 @@ class bezierSpline {
     }
 
     spaceInject(distBetween){
-        if(this.sectioned.length == 0){
-            this.section();
-            this.inject(50 * this.sectioned.length); 
-            this.MultiCumDistLUT();
-        }
+        this.section();
+        this.inject(50 * this.sectioned.length); 
+        this.MultiCumDistLUT();
+        
 
         const path = [];
         const curveLength = this.sectioned[this.sectioned.length - 1].cumD[this.sectioned[this.sectioned.length - 1].cumD.length - 1][1];
@@ -90,7 +89,8 @@ class bezierSpline {
     }
 
     // returns complete spline
-    transfer(){
+    generateSpline(distBetween){
+        spaceInject(distBetween);
         const path = [];
         for(let i = 0; i < this.spline.length; i++){
             path.push(this.spline[i][1]);
