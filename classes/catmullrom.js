@@ -42,7 +42,7 @@ class CatmullRom{
         return this;
     }
 
-    speeds(maxAccels){
+    speeds(maxAccel){
         this.injected[this.injected.length - 1].push(0);
 
         for(let i = this.injected.length - 1; i > 0; i--){
@@ -50,6 +50,6 @@ class CatmullRom{
             newVel = Math.sqrt(2 * maxAccel * dist + Math.pow(this.injected[i][2], 2));
             this.injected[i - 1].push(newVel);
         }
-        return speeds;
+        return this;
     }
 }

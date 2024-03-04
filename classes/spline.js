@@ -146,6 +146,7 @@ class bezierSpline {
             newVel = Math.sqrt(2 * maxAccel * dist + Math.pow(this.spline[i][2], 2));
             this.spline[i - 1].push(newVel);
         }
+        return this;
     }
 
 }
