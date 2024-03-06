@@ -55,7 +55,7 @@ class bezierSpline {
     getT(dist){
         for(let k = 0; k < this.sectioned.length; k++){
             for(let i = 1; i < this.sectioned[k].cumD.length; i++){
-                if(this.sectioned[k].cumD[i][1] >= dist){
+                if(this.sectioned[k].cumD[i][1] >= dist - 0.001){
                     const dValue1 = new Point(this.sectioned[k].cumD[i - 1][0], this.sectioned[k].cumD[i - 1][1]);
                     const dValue2 = new Point(this.sectioned[k].cumD[i][0], this.sectioned[k].cumD[i][1]);
                     const t = (dist - dValue1.y) / (dValue2.y - dValue1.y);
@@ -118,14 +118,13 @@ class bezierSpline {
         return this;
     }
 
-    // fix tmrw
     // curvature(t){
     //     const u = Math.floor(t);
     //     const tPrime = t - u;
     //     return this.sectioned[u].evaluate(tPrime);
     // }
     
-    generateVelocities(maxVel, maxAccel, k = 5){
+    generateVelocities(maxVel, maxAccel, k = 3){
         // velocity of last point to be 0
         this.spline[this.spline.length - 1].push(0);
 
@@ -157,9 +156,10 @@ class bezierSpline {
         return this;
     }
      // returns complete spline
-     generateSpline(distBetween, maxVel, maxAccel){
+     // k is a value measuring how fast the bot should move at turns.
+     generateSpline(distBetween, maxVel, maxAccel, k = 3){
         this.spaceInject(distBetween);
-        this.generateVelocities(maxVel, maxAccel);
+        this.generateVelocities(maxVel, maxAccel, k);
         const path = [];
 
         // first index is point, second part is speed
