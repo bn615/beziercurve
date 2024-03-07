@@ -124,7 +124,7 @@ class bezierSpline {
     //     return this.sectioned[u].evaluate(tPrime);
     // }
     
-    generateVelocities(maxVel, maxAccel, k = 3){
+    generateVelocities(maxVel, maxAccel, k){
         // velocity of last point to be 0
         this.spline[this.spline.length - 1].push(0);
 
