@@ -16,45 +16,74 @@ class CatmullRom{
         return this;
     }
 
-    evaluate(t, p0, p1, p2, p3){ // reference: https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline
-        const t0 = 0, t1 = 1, t2 = 2, t3 = 3; //uniform (change for chordal/centripetal)
-        const a1 = Point.add(p0.multiply((t1-t)/(t1-t0)),p1.multiply((t-t0)/(t1-t0)));
-        const a2 = Point.add(p1.multiply((t2-t)/(t2-t1)),p2.multiply((t-t1)/(t2-t1)));
-        const a3 = Point.add(p2.multiply((t3-t)/(t3-t2)),p3.multiply((t-t2)/(t3-t2)));
-        const b1 = Point.add(a1.multiply((t2-t)/(t2-t0)),a2.multiply((t-t0)/(t2-t0)));
-        const b2 = Point.add(a2.multiply((t3-t)/(t3-t1)),a3.multiply((t-t1)/(t3-t1)));
-        const c = Point.add(b1.multiply((t2-t)/(t2-t1)),b2.multiply((t-t1)/(t2-t1)));
-        return c;
+    
+    evaluate(p0, p1, p2, p3, t) {
+        const c0 = p1;
+        const c1 = Point.sum(p0.multiply(-0.5), p2.multiply(0.5));
+        const c2 = Point.sum(p0, p1.multiply(-2.5), p2.multiply(2), p3.multiply(-0.5)); 
+        const c3 = Point.sum(p0.multiply(-0.5), p1.multiply(1.5), p2.multiply(-1.5), p3.multiply(0.5));
+      
+        const t2 = t * t;
+        const t3 = t2 * t;
+      
+        return Point.sum(c0, c1.multiply(t), c2.multiply(t2), c3.multiply(t3));
+        
     }
 
+    derivative(p0, p1, p2, p3, t){
+        const c1 = Point.sum(p0.multiply(-0.5), p2.multiply(0.5));
+        const c2 = Point.sum(p0.multiply(2), p1.multiply(-5), p2.multiply(4), p3.multiply(-1));
+        const c3 = Point.sum(p0.multiply(-1.5), p1.multiply(4.5), p2.multiply(-4.5), p3.multiply(1.5));
+      
+        const t2 = t * t;
+      
+        return Point.sum(c1, c2.multiply(t), c3.multiply(t2));
+    }
+
+    derivative2(p0, p1, p2, p3, t){
+        const c2 = Point.sum(p0.multiply(2), p1.multiply(-5), p2.multiply(4), p3.multiply(-1));
+        const c3 = Point.sum(p0.multiply(-3), p1.multiply(9), p2.multiply(-9), p3.multiply(3));
+
+        return Point.sum(c2, c3.multiply(t));
+    }
+    
+    curvature(p0, p1, p2, p3, t){
+        const firstDPoint = this.derivative(p0, p1, p2, p3, t);
+        const secondDPoint = this.derivative2(p0, p1, p2, p3, t);
+        const numerator = firstDPoint.x * secondDPoint.y - firstDPoint.y * secondDPoint.x;
+        const denominator = Math.pow(firstDPoint.magnitude(), 3);
+        return numerator / denominator;
+    }
    
 
     speeds(maxAccel){
-        this.injected[this.injected.length - 1].push(0);
-
+        
         for(let i = this.injected.length - 1; i > 0; i--){
             const dist = Point.distance(this.injected[i][1], this.injected[i - 1][1]);
             let newVel = Math.sqrt(2 * maxAccel * dist + Math.pow(this.injected[i][2], 2));
-            newVel = Math.min(newVel, this.spline[i][2]);
-            this.injected[i - 1].push(newVel);
+            newVel = Math.min(newVel, this.injected[i - 1][2]);
+            this.injected[i - 1][2] = newVel;
         }
         return this;
     }
 
 
-    generate(maxAccel){
+    generatePath(maxVel, maxAccel, k = 3){
         this.addGhostPoints();
         const path = [];
         for(let i = 0; i < this.points.length - 3; i++){
             const dist = Point.distance(this.points[i + 1], this.points[i + 2]);
             for(let j = 0; j < dist; j++){
-                const t = j / floor(dist);
-                const newPoint = this.evaluate(t, this.points[i], this.points[i + 1], this.points[i + 2], this.points[i + 3]);
-                path.push(newPoint);
+                const t = j / Math.floor(dist);
+                const cur = Math.abs(this.curvature(this.points[i], this.points[i + 1], this.points[i + 2], this.points[i + 3], t));
+                const vel = Math.min(maxVel, k / cur);
+                const newPoint = this.evaluate(this.points[i], this.points[i + 1], this.points[i + 2], this.points[i + 3], t);
+                path.push([t+i, newPoint, vel]);
             }
         }
+        path.push([this.points.length - 3, this.points[this.points.length - 2], 0])
         this.injected = path;
-        this.speeds(maxAccel)
-        return this;
+        this.speeds(maxAccel);
+        return this.injected;
     }
 }
